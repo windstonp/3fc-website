@@ -1,12 +1,14 @@
-import { render, screen } from '@/utils/tests';
+import { render, screen } from "@/utils/tests";
 import "@testing-library/jest-dom";
 
-import { Container } from '.';
+import { Container } from ".";
 
-describe('<Container />', () => {
-  it('should render correctly', () => {
-    render(<Container />);
+describe("<Container />", () => {
+  it("should render correctly", () => {
+    render(<Container>Teste</Container>);
 
-    expect(screen.getByRole('heading', { name: /Container/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /Container/i })
+    ).toBeInTheDocument();
   });
 });
