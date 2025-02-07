@@ -12,7 +12,7 @@ export function ProductCard({
   title,
 }: IProductCardProps) {
   return (
-    <div className="bg-gray-100 rounded-xl shadow-md p-4 text-center max-w-xs">
+    <div className="bg-gray-100 rounded-xl shadow-md p-4 text-center ">
       <div className="rounded-lg overflow-hidden">
         <Image
           src={imageSrc}

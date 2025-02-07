@@ -8,13 +8,13 @@ export function NavBar() {
       className={`fixed z-10 top-0 right-0 left-0 menu-bg ${Styles.menu__bg}`}
     >
       <Container>
-        <nav className="p-4">
+        <nav className="py-4">
           <div className="flex items-center justify-between">
             <img alt="3fc Logo" src="/img/logo.png" className="h-50" />
             <div className="flex items-center justify-between">
               <ul className="flex space-x-6 mr-4">
                 <li>
-                  <Link href="#">
+                  <Link href="#Home">
                     <Button
                       className="text-white hover:text-gray-400"
                       variant="link"
@@ -24,7 +24,7 @@ export function NavBar() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#">
+                  <Link href="#services">
                     <Button
                       className="text-white hover:text-gray-400"
                       variant="link"
@@ -34,7 +34,7 @@ export function NavBar() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#">
+                  <Link href="#about">
                     <Button
                       className="text-white hover:text-gray-400"
                       variant="link"

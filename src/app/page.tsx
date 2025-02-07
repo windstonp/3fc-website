@@ -21,18 +21,18 @@ export default function Home() {
   );
 
   return (
-    <main>
+    <main id="Home">
       <img
         className="relative w-full"
         src="/img/banner.png"
         alt="Homepage banner"
       />
-      <section>
+      <section id="services">
         <Container>
           <h1 className="mx-auto text-center text-3xl sm:text-4xl font-bold my-9">
             Nossos produtos
           </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-center">
             {mockProducts.map((product, index) => (
               <ProductCard key={index} {...product} />
             ))}
@@ -41,10 +41,10 @@ export default function Home() {
       </section>
       <section>
         <Container>
-          <h1 className="mx-auto text-center text-3xl sm:text-4xl font-bold my-9">
+          <h1 className="mx-auto text-center text-3xl sm:text-4xl font-bold my-8">
             Nossos Clientes
           </h1>
-          <div className="w-full mx-auto p-4">
+          <div className="w-full">
             <div className="bg-[#E5E5E5] rounded-2xl p-8">
               <Carousel
                 opts={{
