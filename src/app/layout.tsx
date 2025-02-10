@@ -3,6 +3,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
+import { Toaster } from "@/components/ui/toaster";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <NavBar />
         {children}
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

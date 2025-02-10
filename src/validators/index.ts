@@ -9,12 +9,19 @@ export const companySchema = yup.object().shape({
   logo: yup.mixed().optional(),
 });
 
-export const productSchema = yup.object().shape({
-  name: yup.string().min(2).required(),
-  description: yup.string().min(5).required(),
-  image: yup.mixed().optional(),
+export const productSchema = yup.object({
+  products: yup.array().of(
+    yup.object({
+      firebaseId: yup.string().nullable(),
+      name: yup.string().required("O nome do produto é obrigatório"),
+      image: yup
+        .string()
+        .url("O link da imagem precisa ser uma URL válida")
+        .required("O link da imagem é obrigatório"),
+      description: yup.string().required("A descrição é obrigatória"),
+    })
+  ),
 });
-
 export const clientSchema = yup.object().shape({
   clientName: yup.string().min(2).required(),
   clientImage: yup.mixed().optional(),
