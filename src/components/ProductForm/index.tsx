@@ -35,6 +35,7 @@ export function ProductForm() {
   });
 
   const [removedProducts, setRemovedProducts] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -50,20 +51,20 @@ export function ProductForm() {
         };
       });
 
-      if (productsData.length === 0) {
-        setValue("products", [
-          { firebaseId: "", name: "", image: "", description: "" },
-        ]);
-      } else {
-        setValue("products", productsData);
-      }
+      setValue(
+        "products",
+        productsData.length > 0
+          ? productsData
+          : [{ firebaseId: "", name: "", image: "", description: "" }]
+      );
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
     }
   }, [setValue]);
+
   useEffect(() => {
     fetchProducts();
-  }, [setValue]);
+  }, [fetchProducts]);
 
   const handleRemoveItem = (index: number, firebaseId?: string) => {
     if (fields.length === 1) {
@@ -83,6 +84,9 @@ export function ProductForm() {
   };
 
   const handleProductSubmit: SubmitHandler<IProductDTO> = async (data) => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const promises = (data.products ?? []).map(async (product) => {
         if (product.firebaseId) {
@@ -107,9 +111,10 @@ export function ProductForm() {
         const productRef = doc(db, "products", id);
         await deleteDoc(productRef);
       });
-      await Promise.all(deletionPromises);
 
+      await Promise.all(deletionPromises);
       setRemovedProducts([]);
+
       await fetchProducts();
 
       toast({
@@ -124,6 +129,8 @@ export function ProductForm() {
         title: "Erro",
         description: "Ocorreu um erro ao atualizar/adicionar os produtos.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -175,7 +182,7 @@ export function ProductForm() {
                       )
                     }
                     variant="destructive"
-                    disabled={fields.length === 1}
+                    disabled={fields.length === 1 || isSubmitting}
                   >
                     <FaTrash />
                   </Button>
@@ -193,10 +200,13 @@ export function ProductForm() {
                     description: "",
                   })
                 }
+                disabled={isSubmitting}
               >
                 Adicionar Produto
               </Button>
-              <Button type="submit">Salvar Produtos!</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Salvando..." : "Salvar Produtos!"}
+              </Button>
             </div>
           </form>
         </AccordionContent>
