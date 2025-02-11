@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useState } from "react";
 import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -138,78 +140,76 @@ export function ProductForm() {
     <AccordionItem className="p-4" value="Products">
       <AccordionTrigger>Produtos</AccordionTrigger>
       <AccordionContent>
-        <AccordionContent>
-          <form
-            onSubmit={handleSubmit(handleProductSubmit)}
-            className="justify-between"
-          >
-            {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="space-y-2 border p-4 rounded-md my-4"
-              >
-                <InputControlled
-                  control={control}
-                  name={`products.${index}.firebaseId`}
-                  label="ID do Firebase"
-                  type="hidden"
-                />
-                <InputControlled
-                  control={control}
-                  name={`products.${index}.name`}
-                  label="Nome do Produto"
-                  placeholder="Product Name"
-                />
-                <InputControlled
-                  control={control}
-                  name={`products.${index}.image`}
-                  label="Imagem"
-                  placeholder="Insira o link da imagem"
-                />
-                <InputControlled
-                  control={control}
-                  name={`products.${index}.description`}
-                  label="Descrição"
-                  placeholder="Description"
-                />
-                <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    onClick={() =>
-                      handleRemoveItem(
-                        index,
-                        field.firebaseId as string | undefined
-                      )
-                    }
-                    variant="destructive"
-                    disabled={fields.length === 1 || isSubmitting}
-                  >
-                    <FaTrash />
-                  </Button>
-                </div>
+        <form
+          onSubmit={handleSubmit(handleProductSubmit)}
+          className="justify-between"
+        >
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="space-y-2 border p-4 rounded-md my-4"
+            >
+              <InputControlled
+                control={control}
+                name={`products.${index}.firebaseId`}
+                label=""
+                type="hidden"
+              />
+              <InputControlled
+                control={control}
+                name={`products.${index}.name`}
+                label="Nome do Produto"
+                placeholder="Product Name"
+              />
+              <InputControlled
+                control={control}
+                name={`products.${index}.image`}
+                label="Imagem"
+                placeholder="Insira o link da imagem"
+              />
+              <InputControlled
+                control={control}
+                name={`products.${index}.description`}
+                label="Descrição"
+                placeholder="Description"
+              />
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  onClick={() =>
+                    handleRemoveItem(
+                      index,
+                      field.firebaseId as string | undefined
+                    )
+                  }
+                  variant="destructive"
+                  disabled={fields.length === 1 || isSubmitting}
+                >
+                  <FaTrash />
+                </Button>
               </div>
-            ))}
-            <div className="flex justify-between items-center mt-4">
-              <Button
-                type="button"
-                onClick={() =>
-                  append({
-                    firebaseId: "",
-                    name: "",
-                    image: "",
-                    description: "",
-                  })
-                }
-                disabled={isSubmitting}
-              >
-                Adicionar Produto
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Salvando..." : "Salvar Produtos!"}
-              </Button>
             </div>
-          </form>
-        </AccordionContent>
+          ))}
+          <div className="flex justify-between items-center mt-4">
+            <Button
+              type="button"
+              onClick={() =>
+                append({
+                  firebaseId: "",
+                  name: "",
+                  image: "",
+                  description: "",
+                })
+              }
+              disabled={isSubmitting}
+            >
+              Adicionar Produto
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Salvando..." : "Salvar Produtos!"}
+            </Button>
+          </div>
+        </form>
       </AccordionContent>
     </AccordionItem>
   );

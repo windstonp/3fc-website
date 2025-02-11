@@ -1,80 +1,44 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { AccordionContent } from "@radix-ui/react-accordion";
-import { clientSchema, companySchema, productSchema } from "@/validators";
-import "./dashboardStyles.css";
-import { ProductForm } from "@/components/ProductForm";
+import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { toast } from "@/hooks/use-toast";
+import "./dashboard/dashboardStyles.css";
+import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
-  const companyForm = useForm({ resolver: yupResolver(companySchema) });
+export default function Page() {
+  const router = useRouter();
 
-  const clientForm = useForm({ resolver: yupResolver(clientSchema) });
-
-  const handleCompanySubmit = async (data: any) => {};
-
-  const handleClientSubmit = async (data: any) => {};
-
+  const handleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user.email !== "joaor4e@gmail.com") {
+        toast({
+          variant: "error",
+          title: "Erro no login",
+          description: "Você não possui permissão para fazer o login.",
+        });
+        await signOut(auth);
+      } else {
+        router.push("/admin/dashboard");
+      }
+    } catch (error) {
+      toast({
+        variant: "error",
+        title: "Erro no login",
+        description: "Não foi possível efetuar o login com o Google.",
+      });
+    }
+  };
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold">Dashboard CRM</h1>
-      <Accordion type="single" collapsible>
-        <AccordionItem className="p-4" value="Empresa">
-          <AccordionTrigger>Empresa</AccordionTrigger>
-          <AccordionContent>
-            <form
-              onSubmit={companyForm.handleSubmit(handleCompanySubmit)}
-              className="space-y-4"
-            >
-              <Input
-                {...companyForm.register("whatsappNumber")}
-                placeholder="WhatsApp Number"
-              />
-              <Input {...companyForm.register("email")} placeholder="Email" />
-              <Input
-                {...companyForm.register("address")}
-                placeholder="Address"
-              />
-              <Input
-                {...companyForm.register("instagram")}
-                placeholder="Instagram"
-              />
-              <Input
-                {...companyForm.register("facebook")}
-                placeholder="Facebook"
-              />
-              <Input type="file" {...companyForm.register("logo")} />
-              <Button type="submit">Update Company</Button>
-            </form>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem className="p-4" value="Clients">
-          <AccordionTrigger>Clientes</AccordionTrigger>
-
-          <AccordionContent>
-            <form
-              onSubmit={clientForm.handleSubmit(handleClientSubmit)}
-              className="space-y-4"
-            >
-              <Input
-                {...clientForm.register("clientName")}
-                placeholder="Client Name"
-              />
-              <Input type="file" {...clientForm.register("clientImage")} />
-              <Button type="submit">Update Client</Button>
-            </form>
-          </AccordionContent>
-        </AccordionItem>
-        <ProductForm />
-      </Accordion>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col gap-6">
+          <Button variant="outline" className="w-full" onClick={handleSignIn}>
+            Login com o Google
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
