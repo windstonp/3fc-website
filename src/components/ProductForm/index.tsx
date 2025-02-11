@@ -203,7 +203,7 @@ export function ProductForm() {
               </div>
             );
           })}
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex justify-between items-center space-y-4 mt-4 flex-wrap">
             <Button
               type="button"
               onClick={() =>
