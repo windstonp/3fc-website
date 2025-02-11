@@ -26,7 +26,7 @@ import { FaTrash } from "react-icons/fa";
 export function ClientsForm() {
   const [removedClients, setRemovedClients] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { control, handleSubmit, setValue } = useForm<IClientDTO>({
+  const { control, handleSubmit, setValue, watch } = useForm<IClientDTO>({
     resolver: yupResolver(clientSchema),
     defaultValues: {
       clients: [{ firebaseId: "", clientName: "", clientImage: "" }],
@@ -143,46 +143,63 @@ export function ClientsForm() {
       <AccordionTrigger>Clientes</AccordionTrigger>
       <AccordionContent>
         <form onSubmit={handleSubmit(handleClientSubmit)} className="space-y-4">
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="space-y-2 border p-4 rounded-md my-4"
-            >
-              <InputControlled
-                label=""
-                control={control}
-                name={`clients.${index}.firebaseId`}
-                type="hidden"
-              />
-              <InputControlled
-                control={control}
-                name={`clients.${index}.clientName`}
-                label="Nome do Cliente"
-                placeholder="Nome do Cliente"
-              />
-              <InputControlled
-                control={control}
-                name={`clients.${index}.clientImage`}
-                label="Imagem do Cliente"
-                placeholder="URL da imagem ou arquivo"
-              />
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleRemoveItem(
-                      index,
-                      field.firebaseId as string | undefined
-                    )
-                  }
-                  variant="destructive"
-                  disabled={fields.length === 1 || isSubmitting}
-                >
-                  <FaTrash />
-                </Button>
+          {fields.map((field, index) => {
+            const clientImage = watch(`clients.${index}.clientImage`);
+
+            return (
+              <div
+                key={field.id}
+                className="space-y-4 border p-4 rounded-md my-4"
+              >
+                <h1>Cliente {index + 1}</h1>
+
+                <InputControlled
+                  label=""
+                  control={control}
+                  name={`clients.${index}.firebaseId`}
+                  type="hidden"
+                />
+                <InputControlled
+                  control={control}
+                  name={`clients.${index}.clientName`}
+                  label="Nome do Cliente"
+                  placeholder="Nome do Cliente"
+                />
+
+                {clientImage && (
+                  <div className="flex justify-center h-[200]">
+                    <img
+                      src={clientImage}
+                      alt="Pré-visualização"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                    />
+                  </div>
+                )}
+                <InputControlled
+                  control={control}
+                  name={`clients.${index}.clientImage`}
+                  label="Imagem do Cliente"
+                  placeholder="URL da imagem ou arquivo"
+                />
+
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveItem(
+                        index,
+                        field.firebaseId as string | undefined
+                      )
+                    }
+                    variant="destructive"
+                    disabled={fields.length === 1 || isSubmitting}
+                  >
+                    <FaTrash />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div className="flex justify-between items-center mt-4">
             <Button
               type="button"
