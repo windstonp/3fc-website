@@ -6,7 +6,7 @@ import { ClientsForm } from "@/components/ClientsForm";
 import "./dashboardStyles.css";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export default function Dashboard() {
@@ -16,9 +16,6 @@ export default function Dashboard() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.push("/admin");
-      } else if (user.email !== "joaor4e@gmail.com") {
-        signOut(auth);
-        router.push("/not-authorized");
       }
     });
 

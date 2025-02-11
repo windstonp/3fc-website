@@ -171,7 +171,7 @@ export function ClientsForm() {
                     <img
                       src={clientImage}
                       alt="Pré-visualização"
-                      className="w-32 h-32 object-cover rounded-md border"
+                      className="w-[80] h-[80] object-cover rounded-md border"
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   </div>

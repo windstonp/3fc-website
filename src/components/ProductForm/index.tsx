@@ -168,7 +168,7 @@ export function ProductForm() {
                     <img
                       src={productImage}
                       alt="Pré-visualização"
-                      className="w-32 h-32 object-cover rounded-md border"
+                      className="w-[300] h-[200] object-cover rounded-md border"
                     />
                   </div>
                 )}
