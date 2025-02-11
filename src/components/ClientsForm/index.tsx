@@ -167,10 +167,11 @@ export function ClientsForm() {
                 />
 
                 {clientImage && (
-                  <div className="flex justify-center h-[200]">
+                  <div className="flex justify-center">
                     <img
                       src={clientImage}
                       alt="Pré-visualização"
+                      className="w-32 h-32 object-cover rounded-md border"
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   </div>

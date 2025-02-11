@@ -24,7 +24,7 @@ import { IProductDTO, productSchema } from "@/validators";
 import { InputControlled } from "../InputControlled";
 
 export function ProductForm() {
-  const { control, handleSubmit, setValue } = useForm<IProductDTO>({
+  const { control, handleSubmit, setValue, watch } = useForm<IProductDTO>({
     resolver: yupResolver(productSchema),
     defaultValues: {
       products: [{ firebaseId: "", name: "", image: "", description: "" }],
@@ -144,52 +144,65 @@ export function ProductForm() {
           onSubmit={handleSubmit(handleProductSubmit)}
           className="justify-between"
         >
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="space-y-2 border p-4 rounded-md my-4"
-            >
-              <InputControlled
-                control={control}
-                name={`products.${index}.firebaseId`}
-                label=""
-                type="hidden"
-              />
-              <InputControlled
-                control={control}
-                name={`products.${index}.name`}
-                label="Nome do Produto"
-                placeholder="Product Name"
-              />
-              <InputControlled
-                control={control}
-                name={`products.${index}.image`}
-                label="Imagem"
-                placeholder="Insira o link da imagem"
-              />
-              <InputControlled
-                control={control}
-                name={`products.${index}.description`}
-                label="Descrição"
-                placeholder="Description"
-              />
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleRemoveItem(
-                      index,
-                      field.firebaseId as string | undefined
-                    )
-                  }
-                  variant="destructive"
-                  disabled={fields.length === 1 || isSubmitting}
-                >
-                  <FaTrash />
-                </Button>
+          {fields.map((field, index) => {
+            const productImage = watch(`products.${index}.image`);
+            return (
+              <div
+                key={field.id}
+                className="space-y-2 border p-4 rounded-md my-4"
+              >
+                <InputControlled
+                  control={control}
+                  name={`products.${index}.firebaseId`}
+                  label=""
+                  type="hidden"
+                />
+                <InputControlled
+                  control={control}
+                  name={`products.${index}.name`}
+                  label="Nome do Produto"
+                  placeholder="Product Name"
+                />
+                {productImage && (
+                  <div className="flex justify-center">
+                    <img
+                      src={productImage}
+                      alt="Pré-visualização"
+                      className="w-32 h-32 object-cover rounded-md border"
+                    />
+                  </div>
+                )}
+                <InputControlled
+                  control={control}
+                  name={`products.${index}.image`}
+                  label="Imagem"
+                  placeholder="Insira o link da imagem"
+                />
+
+                <InputControlled
+                  control={control}
+                  name={`products.${index}.description`}
+                  label="Descrição"
+                  placeholder="Description"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveItem(
+                        index,
+                        field.firebaseId as string | undefined
+                      )
+                    }
+                    variant="destructive"
+                    disabled={fields.length === 1 || isSubmitting}
+                  >
+                    <FaTrash />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div className="flex justify-between items-center mt-4">
             <Button
               type="button"
