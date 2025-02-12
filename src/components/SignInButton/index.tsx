@@ -12,6 +12,7 @@ export function SignInButton() {
       await signInWithPopup(auth, googleProvider);
       router.push("/admin/dashboard");
     } catch (error) {
+      console.log(error);
       toast({
         variant: "error",
         title: "Erro no login",

@@ -9,7 +9,6 @@ import { ICompanyDTO } from "@/validators";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 export function Footer() {
   async function fetchCompanyData(): Promise<ICompanyDTO> {

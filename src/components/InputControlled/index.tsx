@@ -1,10 +1,10 @@
-import { Controller } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
 
 interface InputControlledProps {
-  readonly control: any;
+  readonly control: Control<any>;
   readonly name: string;
   readonly label: string;
   readonly placeholder?: string;
