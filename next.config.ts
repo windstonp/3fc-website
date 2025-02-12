@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
       },
+      {
+        hostname: "i.imgur.com",
+        protocol: "https",
+      },
     ],
   },
 };

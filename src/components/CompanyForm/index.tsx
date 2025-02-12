@@ -23,7 +23,6 @@ export function CompanyForm() {
       whatsappNumber: "",
       instagram: "",
       facebook: "",
-      about: "",
       whatsappLink: "",
     },
   });
@@ -43,7 +42,6 @@ export function CompanyForm() {
         setValue("whatsappNumber", docSnap.data().whatsappNumber || "");
         setValue("instagram", docSnap.data().instagram || "");
         setValue("facebook", docSnap.data().facebook || "");
-        setValue("about", docSnap.data().about || "");
       }
     } catch (error) {
       console.error("Erro ao buscar dados da empresa:", error);
@@ -135,12 +133,6 @@ export function CompanyForm() {
             name="facebook"
             label="Facebook"
             placeholder="Link do Facebook"
-          />
-          <InputControlled
-            control={control}
-            name="about"
-            label="Sobre"
-            placeholder="Sobre a empresa"
           />
           <div className="flex flex-col justify-end">
             <Button type="submit" disabled={isSubmitting}>

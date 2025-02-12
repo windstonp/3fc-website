@@ -1,5 +1,4 @@
 import { SignInButton } from "@/components/SignInButton";
-import "./dashboard/dashboardStyles.css";
 
 export default function Page() {
   return (

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/NavBar";
-import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { ReactQueryProvider } from "@/providers/queryClientProvider";
+import FloatingWhatsappButton from "@/components/WhatsappButton";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
@@ -31,10 +31,11 @@ export default function RootLayout({
       <body
         className={`${robotoSans.variable} ${robotoMono.variable} antialiased`}
       >
-        <NavBar />
-        {children}
-        <Footer />
-        <Toaster />
+        <ReactQueryProvider>
+          {children}
+          <Toaster />
+          <FloatingWhatsappButton />
+        </ReactQueryProvider>
       </body>
     </html>
   );

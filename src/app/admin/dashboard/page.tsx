@@ -3,7 +3,6 @@ import { Accordion } from "@/components/ui/accordion";
 import { ProductForm } from "@/components/ProductForm";
 import { CompanyForm } from "@/components/CompanyForm";
 import { ClientsForm } from "@/components/ClientsForm";
-import "./dashboardStyles.css";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";

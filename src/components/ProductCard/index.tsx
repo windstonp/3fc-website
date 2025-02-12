@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 
 interface IProductCardProps {
@@ -13,13 +14,14 @@ export function ProductCard({
 }: IProductCardProps) {
   return (
     <div className="bg-gray-100 rounded-xl shadow-md p-4 text-center ">
-      <div className="rounded-lg overflow-hidden">
+      <div className="rounded-lg max-w-[400] max-h-[300] overflow-hidden mx-auto">
         <Image
           src={imageSrc}
           alt={title}
-          width={300}
-          height={200}
-          className="w-full object-cover"
+          width={400}
+          height={300}
+          className="w-full"
+          loading="lazy"
         />
       </div>
       <h2 className="text-lg font-bold mt-4">{title}</h2>

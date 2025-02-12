@@ -1,13 +1,12 @@
 import * as yup from "yup";
 
 export const companySchema = yup.object().shape({
-  whatsappNumber: yup.string().required(),
-  whatsappLink: yup.string().required(),
-  email: yup.string().email().required(),
-  address: yup.string().min(5).required(),
-  instagram: yup.string().required(),
-  facebook: yup.string().required(),
-  about: yup.string().required(),
+  whatsappNumber: yup.string().required("o numero do whatsapp é obrigatório"),
+  whatsappLink: yup.string().required("o link para orçamento é obrigatório"),
+  email: yup.string().email().required("o campo E-mail é obrigatório"),
+  address: yup.string().min(5).required("o campo endereço é obrigatório"),
+  instagram: yup.string().required("o link para o instagram é obrigatório"),
+  facebook: yup.string().required("o link para o facebook é obrigatório"),
 });
 
 export const productSchema = yup.object({
