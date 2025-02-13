@@ -94,6 +94,7 @@ export function HomeScreen() {
           src={company?.banner ?? "#"}
           width={2000}
           height={1000}
+          priority
           alt="Homepage banner"
         />
       )}
@@ -149,6 +150,7 @@ export function HomeScreen() {
                               alt={client.clientName}
                               width={300}
                               height={300}
+                              loading="lazy"
                               className="w-full h-auto rounded-lg object-cover"
                             />
                           </div>
@@ -171,6 +173,7 @@ export function HomeScreen() {
               alt="Sobre Nós"
               width={400}
               height={400}
+              loading="lazy"
               className="rounded-lg w-full"
             />
           </div>

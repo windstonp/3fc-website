@@ -43,6 +43,7 @@ export function Footer() {
             alt="3fc Logo"
             width={300}
             height={300}
+            priority
             className="w-24"
           />
 

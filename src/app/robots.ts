@@ -10,6 +10,8 @@ export default function robots(): MetadataRoute.Robots {
         crawlDelay: 10,
       },
     ],
-    sitemap: `${process.env.NEXT_PUBLIC_BASE_URL}/sitemap.xml`,
+    sitemap: `${
+      process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.grafica3fc.com/"
+    }sitemap.xml`,
   };
 }

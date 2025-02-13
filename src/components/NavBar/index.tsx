@@ -54,6 +54,7 @@ export function NavBar() {
               src="/img/logo.png"
               width={100}
               height={50}
+              priority
               className="hidden md:flex"
             />
             <div className="hidden md:flex items-center">
