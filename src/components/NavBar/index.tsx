@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ICompanyDTO } from "@/validators";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,10 +49,12 @@ export function NavBar() {
                 <Menu size={32} />
               </button>
             </div>
-            <img
+            <Image
               alt="3fc Logo"
               src="/img/logo.png"
-              className="h-50 hidden md:flex"
+              width={100}
+              height={50}
+              className="hidden md:flex"
             />
             <div className="hidden md:flex items-center">
               <ul className="flex space-x-6 mr-4">

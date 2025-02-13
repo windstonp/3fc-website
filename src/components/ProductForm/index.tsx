@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -22,9 +22,13 @@ import { FaTrash } from "react-icons/fa";
 import { toast } from "@/hooks/use-toast";
 import { IProductDTO, productSchema } from "@/validators";
 import { InputControlled } from "../InputControlled";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function ProductForm() {
-  const { control, handleSubmit, setValue, watch } = useForm<IProductDTO>({
+  const queryClient = useQueryClient();
+  const [removedProducts, setRemovedProducts] = useState<string[]>([]);
+
+  const { control, handleSubmit, reset, watch } = useForm<IProductDTO>({
     resolver: yupResolver(productSchema),
     defaultValues: {
       products: [{ firebaseId: "", name: "", image: "", description: "" }],
@@ -36,61 +40,46 @@ export function ProductForm() {
     name: "products",
   });
 
-  const [removedProducts, setRemovedProducts] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fetchProducts = useCallback(async () => {
-    try {
-      const productsCollectionRef = collection(db, "products");
-      const querySnapshot = await getDocs(productsCollectionRef);
-      const productsData = querySnapshot.docs.map((docSnap) => {
-        const data = docSnap.data();
-        return {
-          firebaseId: docSnap.id,
-          name: data.name || "",
-          image: data.image || "",
-          description: data.description || "",
-        };
-      });
-
-      setValue(
-        "products",
-        productsData.length > 0
-          ? productsData
-          : [{ firebaseId: "", name: "", image: "", description: "" }]
-      );
-    } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
-    }
-  }, [setValue]);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  const handleRemoveItem = (index: number, firebaseId?: string) => {
-    if (fields.length === 1) {
-      toast({
-        variant: "error",
-        title: "Atenção",
-        description: "Deve existir pelo menos um produto.",
-      });
-      return;
-    }
-
-    if (firebaseId) {
-      setRemovedProducts((prev) => [...prev, firebaseId]);
-    }
-
-    remove(index);
+  const fetchProducts = async (): Promise<
+    Array<{
+      firebaseId: string;
+      name: string;
+      image: string;
+      description: string;
+    }>
+  > => {
+    const productsCollectionRef = collection(db, "products");
+    const querySnapshot = await getDocs(productsCollectionRef);
+    return querySnapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        firebaseId: docSnap.id,
+        name: data.name || "",
+        image: data.image || "",
+        description: data.description || "",
+      };
+    });
   };
 
-  const handleProductSubmit: SubmitHandler<IProductDTO> = async (data) => {
-    if (isSubmitting) return;
+  const { data: productsData } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
-    setIsSubmitting(true);
-    try {
-      const promises = (data.products ?? []).map(async (product) => {
+  useEffect(() => {
+    if (productsData) {
+      reset({
+        products:
+          productsData.length > 0
+            ? productsData
+            : [{ firebaseId: "", name: "", image: "", description: "" }],
+      });
+    }
+  }, [productsData, reset]);
+
+  const mutation = useMutation({
+    mutationFn: async (data: IProductDTO) => {
+      const updatePromises = (data.products ?? []).map(async (product) => {
         if (product.firebaseId) {
           const productRef = doc(db, "products", product.firebaseId);
           await updateDoc(productRef, {
@@ -106,34 +95,50 @@ export function ProductForm() {
           });
         }
       });
-
-      await Promise.all(promises);
+      await Promise.all(updatePromises);
 
       const deletionPromises = removedProducts.map(async (id) => {
         const productRef = doc(db, "products", id);
         await deleteDoc(productRef);
       });
-
       await Promise.all(deletionPromises);
-      setRemovedProducts([]);
-
-      await fetchProducts();
-
+    },
+    onSuccess: () => {
       toast({
         variant: "success",
         title: "Produtos atualizados!",
         description: "Os produtos foram atualizados com sucesso.",
       });
-    } catch (error) {
-      console.error("Erro ao atualizar/adicionar produtos:", error);
+      setRemovedProducts([]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: () => {
       toast({
         variant: "error",
         title: "Erro",
         description: "Ocorreu um erro ao atualizar/adicionar os produtos.",
       });
-    } finally {
-      setIsSubmitting(false);
+    },
+  });
+
+  const handleRemoveItem = (index: number, firebaseId?: string) => {
+    if (fields.length === 1) {
+      toast({
+        variant: "error",
+        title: "Atenção",
+        description: "Deve existir pelo menos um produto.",
+      });
+      return;
     }
+
+    if (firebaseId) {
+      setRemovedProducts((prev) => [...prev, firebaseId]);
+    }
+    remove(index);
+  };
+
+  const handleProductSubmit: SubmitHandler<IProductDTO> = (data) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -168,7 +173,7 @@ export function ProductForm() {
                     <img
                       src={productImage}
                       alt="Pré-visualização"
-                      className="w-[300] h-[200] object-cover rounded-md border"
+                      className="w-[300px] h-[200px] object-cover rounded-md border"
                     />
                   </div>
                 )}
@@ -178,7 +183,6 @@ export function ProductForm() {
                   label="Imagem"
                   placeholder="Insira o link da imagem"
                 />
-
                 <InputControlled
                   control={control}
                   name={`products.${index}.description`}
@@ -189,13 +193,10 @@ export function ProductForm() {
                   <Button
                     type="button"
                     onClick={() =>
-                      handleRemoveItem(
-                        index,
-                        field.firebaseId as string | undefined
-                      )
+                      handleRemoveItem(index, field.firebaseId || undefined)
                     }
                     variant="destructive"
-                    disabled={fields.length === 1 || isSubmitting}
+                    disabled={fields.length === 1 || mutation.isPending}
                   >
                     <FaTrash />
                   </Button>
@@ -214,12 +215,12 @@ export function ProductForm() {
                   description: "",
                 })
               }
-              disabled={isSubmitting}
+              disabled={mutation.isPending}
             >
               Adicionar Produto
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar Produtos!"}
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? "Salvando..." : "Salvar Produtos!"}
             </Button>
           </div>
         </form>

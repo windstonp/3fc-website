@@ -33,8 +33,13 @@ export default function FloatingWhatsappButton() {
     <Button
       className="fixed bottom-1/4 right-2 transform -translate-y-1/2 bg-green-500 w-[70px] h-[70px] rounded-full flex items-center justify-center shadow-lg  transition z-10 hover:bg-green-600"
       disabled={isLoadingCompany || isPending}
+      aria-label="Fale conosco!"
     >
-      <Link href={company?.whatsappLink || "#"} target="_blank">
+      <Link
+        aria-label="Fale conosco!"
+        href={company?.whatsappLink || "#"}
+        target="_blank"
+      >
         <FaWhatsapp className="text-white" style={{ width: 35, height: 35 }} />
       </Link>
     </Button>

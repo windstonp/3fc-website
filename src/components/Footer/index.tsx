@@ -43,7 +43,7 @@ export function Footer() {
             alt="3fc Logo"
             width={300}
             height={300}
-            className="w-24 h-24"
+            className="w-24"
           />
 
           <nav className="flex flex-col ml-4">
@@ -100,8 +100,13 @@ export function Footer() {
                 className="bg-black rounded-full"
                 size="icon"
                 disabled={isLoadingCompany || isFetching || isPending}
+                aria-label="Instagram"
               >
-                <Link href={company?.instagram ?? "#"} target="_blank">
+                <Link
+                  aria-label="Instagram"
+                  href={company?.instagram ?? "#"}
+                  target="_blank"
+                >
                   <FaInstagram className="text-white" />
                 </Link>
               </Button>
@@ -109,8 +114,13 @@ export function Footer() {
                 className="bg-black rounded-full"
                 size="icon"
                 disabled={isLoadingCompany || isFetching}
+                aria-label="Facebook"
               >
-                <Link href={company?.facebook ?? "#"} target="_blank">
+                <Link
+                  aria-label="Facebook"
+                  href={company?.facebook ?? "#"}
+                  target="_blank"
+                >
                   <FaFacebook className="text-white" />
                 </Link>
               </Button>

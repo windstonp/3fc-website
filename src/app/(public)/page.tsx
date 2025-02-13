@@ -15,6 +15,7 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
+import FloatingWhatsappButton from "@/components/WhatsappButton";
 
 export default function Home() {
   async function fetchProducts(): Promise<IProductDTO["products"]> {
@@ -95,9 +96,11 @@ export default function Home() {
         {isLoadingCompany || isPending ? (
           <div className="w-full h-[800] bg-gray-200 animate-pulse rounded-md"></div>
         ) : (
-          <img
+          <Image
             className="relative w-full"
             src={company?.banner ?? "#"}
+            width={2000}
+            height={1000}
             alt="Homepage banner"
           />
         )}
@@ -148,12 +151,12 @@ export default function Home() {
                             className="pl-4 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
                           >
                             <div className="aspect-square flex items-center justify-center">
-                              <img
+                              <Image
                                 src={client.clientImage}
                                 alt={client.clientName}
                                 width={300}
                                 height={300}
-                                className="w-full h-auto rounded-lg"
+                                className="w-full h-auto rounded-lg object-cover"
                               />
                             </div>
                           </CarouselItem>
@@ -229,6 +232,8 @@ export default function Home() {
           </Container>
         </section>
       </main>
+      <FloatingWhatsappButton />
+
       <Footer />
     </>
   );
