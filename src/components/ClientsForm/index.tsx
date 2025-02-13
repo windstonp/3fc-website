@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -22,11 +22,13 @@ import { toast } from "@/hooks/use-toast";
 import { clientSchema, IClientDTO } from "@/validators";
 import { InputControlled } from "../InputControlled";
 import { FaTrash } from "react-icons/fa";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function ClientsForm() {
+  const queryClient = useQueryClient();
   const [removedClients, setRemovedClients] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { control, handleSubmit, setValue, watch } = useForm<IClientDTO>({
+
+  const { control, handleSubmit, reset, watch } = useForm<IClientDTO>({
     resolver: yupResolver(clientSchema),
     defaultValues: {
       clients: [{ firebaseId: "", clientName: "", clientImage: "" }],
@@ -38,34 +40,76 @@ export function ClientsForm() {
     name: "clients",
   });
 
-  const fetchClients = useCallback(async () => {
-    try {
-      const clientsCollectionRef = collection(db, "clients");
-      const querySnapshot = await getDocs(clientsCollectionRef);
-      const clientsData = querySnapshot.docs.map((docSnap) => {
-        const data = docSnap.data();
-        return {
-          firebaseId: docSnap.id,
-          clientName: data.clientName || "",
-          clientImage: data.clientImage || "",
-        };
-      });
+  const fetchClients = async (): Promise<
+    { firebaseId: string; clientName: string; clientImage: string }[]
+  > => {
+    const clientsCollectionRef = collection(db, "clients");
+    const querySnapshot = await getDocs(clientsCollectionRef);
+    return querySnapshot.docs.map((docSnap) => ({
+      firebaseId: docSnap.id,
+      clientName: docSnap.data().clientName || "",
+      clientImage: docSnap.data().clientImage || "",
+    }));
+  };
 
-      setValue(
-        "clients",
-        clientsData.length > 0
-          ? clientsData
-          : [{ firebaseId: "", clientName: "", clientImage: "" }]
-      );
-    } catch (error) {
-      console.error("Erro ao buscar clientes:", error);
-      toast({
-        variant: "error",
-        title: "Erro ao buscar clientes",
-        description: "Não foi possível carregar os dados dos clientes.",
+  const { data: clientsData } = useQuery({
+    queryKey: ["clients"],
+    queryFn: fetchClients,
+    refetchOnMount: true,
+  });
+
+  useEffect(() => {
+    if (clientsData) {
+      reset({
+        clients:
+          clientsData.length > 0
+            ? clientsData
+            : [{ firebaseId: "", clientName: "", clientImage: "" }],
       });
     }
-  }, [setValue]);
+  }, [clientsData, reset]);
+
+  const mutation = useMutation({
+    mutationFn: async (data: IClientDTO) => {
+      const updatePromises = (data.clients ?? []).map(async (client) => {
+        if (client.firebaseId) {
+          const clientRef = doc(db, "clients", client.firebaseId);
+          await updateDoc(clientRef, {
+            clientName: client.clientName,
+            clientImage: client.clientImage,
+          });
+        } else {
+          await addDoc(collection(db, "clients"), {
+            clientName: client.clientName,
+            clientImage: client.clientImage,
+          });
+        }
+      });
+      await Promise.all(updatePromises);
+
+      const deletionPromises = removedClients.map(async (id) => {
+        const clientRef = doc(db, "clients", id);
+        await deleteDoc(clientRef);
+      });
+      await Promise.all(deletionPromises);
+    },
+    onSuccess: () => {
+      toast({
+        variant: "success",
+        title: "Clientes atualizados!",
+        description: "Os dados dos clientes foram atualizados com sucesso.",
+      });
+      setRemovedClients([]);
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+    },
+    onError: () => {
+      toast({
+        variant: "error",
+        title: "Erro",
+        description: "Ocorreu um erro ao atualizar/adicionar os clientes.",
+      });
+    },
+  });
 
   const handleRemoveItem = (index: number, firebaseId?: string) => {
     if (fields.length === 1) {
@@ -83,76 +127,23 @@ export function ClientsForm() {
     remove(index);
   };
 
-  const handleClientSubmit: SubmitHandler<IClientDTO> = async (
-    data: IClientDTO
-  ) => {
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      const promises = (data.clients || []).map(async (client) => {
-        if (client.firebaseId) {
-          const clientRef = doc(db, "clients", client.firebaseId);
-          await updateDoc(clientRef, {
-            clientName: client.clientName,
-            clientImage: client.clientImage,
-          });
-        } else {
-          await addDoc(collection(db, "clients"), {
-            clientName: client.clientName,
-            clientImage: client.clientImage,
-          });
-        }
-      });
-
-      await Promise.all(promises);
-
-      const deletionPromises = removedClients.map(async (id) => {
-        const clientRef = doc(db, "clients", id);
-        await deleteDoc(clientRef);
-      });
-
-      await Promise.all(deletionPromises);
-      setRemovedClients([]);
-
-      await fetchClients();
-
-      toast({
-        variant: "success",
-        title: "Clientes atualizados!",
-        description: "Os dados dos clientes foram atualizados com sucesso.",
-      });
-    } catch (error) {
-      console.error("Erro ao atualizar/adicionar clientes:", error);
-      toast({
-        variant: "error",
-        title: "Erro",
-        description: "Ocorreu um erro ao atualizar/adicionar os clientes.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const onSubmit: SubmitHandler<IClientDTO> = (data) => {
+    mutation.mutate(data);
   };
-
-  useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
 
   return (
     <AccordionItem className="p-4" value="Clients">
       <AccordionTrigger>Clientes</AccordionTrigger>
       <AccordionContent>
-        <form onSubmit={handleSubmit(handleClientSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {fields.map((field, index) => {
             const clientImage = watch(`clients.${index}.clientImage`);
-
             return (
               <div
                 key={field.id}
                 className="space-y-4 border p-4 rounded-md my-4"
               >
                 <h1>Cliente {index + 1}</h1>
-
                 <InputControlled
                   label=""
                   control={control}
@@ -165,13 +156,12 @@ export function ClientsForm() {
                   label="Nome do Cliente"
                   placeholder="Nome do Cliente"
                 />
-
                 {clientImage && (
                   <div className="flex justify-center">
                     <img
                       src={clientImage}
                       alt="Pré-visualização"
-                      className="w-[300] h-[300] object-cover rounded-md border"
+                      className="w-[300px] h-[300px] object-cover rounded-md border"
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   </div>
@@ -182,18 +172,14 @@ export function ClientsForm() {
                   label="Imagem do Cliente"
                   placeholder="URL da imagem ou arquivo"
                 />
-
                 <div className="flex justify-end">
                   <Button
                     type="button"
                     onClick={() =>
-                      handleRemoveItem(
-                        index,
-                        field.firebaseId as string | undefined
-                      )
+                      handleRemoveItem(index, field.firebaseId || undefined)
                     }
                     variant="destructive"
-                    disabled={fields.length === 1 || isSubmitting}
+                    disabled={fields.length === 1 || mutation.isPending}
                   >
                     <FaTrash />
                   </Button>
@@ -201,18 +187,18 @@ export function ClientsForm() {
               </div>
             );
           })}
-          <div className="flex justify-between items-center space-y-4 mt-4 flex-wrap">
+          <div className="flex justify-between items-center  mt-4 flex-wrap">
             <Button
               type="button"
               onClick={() =>
                 append({ firebaseId: "", clientName: "", clientImage: "" })
               }
-              disabled={isSubmitting}
+              disabled={mutation.isPending}
             >
               Adicionar Cliente
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar Clientes!"}
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? "Salvando..." : "Salvar Clientes!"}
             </Button>
           </div>
         </form>
