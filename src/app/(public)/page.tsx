@@ -1,7 +1,7 @@
 import { Footer } from "@/components/Footer";
+import { HomeScreen } from "@/components/HomeScreen";
 import { NavBar } from "@/components/NavBar";
 import FloatingWhatsappButton from "@/components/WhatsappButton";
-import Homepage from "@/screens/Homepage";
 
 import { Metadata } from "next";
 
@@ -87,7 +87,7 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <Homepage />
+      <HomeScreen />
       <FloatingWhatsappButton />
       <Footer />
     </>

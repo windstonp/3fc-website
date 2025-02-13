@@ -13,7 +13,7 @@ import { IClientDTO, ICompanyDTO, IProductDTO } from "@/validators";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-export default function Homepage() {
+export function HomeScreen() {
   async function fetchProducts(): Promise<IProductDTO["products"]> {
     const productsCollectionRef = collection(db, "products");
     const collectionSnapProducts = await getDocs(productsCollectionRef);
