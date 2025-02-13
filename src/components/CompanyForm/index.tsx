@@ -15,7 +15,7 @@ import { Button } from "../ui/button";
 import { toast } from "@/hooks/use-toast";
 
 export function CompanyForm() {
-  const { control, handleSubmit, setValue } = useForm<ICompanyDTO>({
+  const { control, handleSubmit, setValue, watch } = useForm<ICompanyDTO>({
     resolver: yupResolver(companySchema),
     defaultValues: {
       email: "",
@@ -24,10 +24,12 @@ export function CompanyForm() {
       instagram: "",
       facebook: "",
       whatsappLink: "",
+      banner: "",
     },
   });
 
   const [isSubmitting, setIsSubmitting] = useState(true);
+  const bannerImage = watch(`banner`);
 
   const fetchCompanyData = useCallback(async () => {
     try {
@@ -42,6 +44,7 @@ export function CompanyForm() {
         setValue("whatsappNumber", docSnap.data().whatsappNumber || "");
         setValue("instagram", docSnap.data().instagram || "");
         setValue("facebook", docSnap.data().facebook || "");
+        setValue("banner", docSnap.data().banner || "");
       }
     } catch (error) {
       console.error("Erro ao buscar dados da empresa:", error);
@@ -92,6 +95,22 @@ export function CompanyForm() {
           onSubmit={handleSubmit(handleCompanySubmit)}
           className="space-y-2 border p-4 rounded-md my-4"
         >
+          {bannerImage && (
+            <div className="flex justify-center">
+              <img
+                src={bannerImage}
+                alt="Pré-visualização"
+                className=" object-cover rounded-md border"
+                onError={(e) => (e.currentTarget.style.display = "none")}
+              />
+            </div>
+          )}
+          <InputControlled
+            control={control}
+            name={`banner`}
+            label="Banner inicial"
+            placeholder="URL da imagem ou arquivo"
+          />
           <InputControlled
             control={control}
             name="email"

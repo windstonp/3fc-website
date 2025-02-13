@@ -7,6 +7,10 @@ export const companySchema = yup.object().shape({
   address: yup.string().min(5).required("o campo endereço é obrigatório"),
   instagram: yup.string().required("o link para o instagram é obrigatório"),
   facebook: yup.string().required("o link para o facebook é obrigatório"),
+  banner: yup
+    .string()
+    .url("O link da imagem precisa ser uma URL válida")
+    .required("O link da imagem é obrigatório"),
 });
 
 export const productSchema = yup.object({

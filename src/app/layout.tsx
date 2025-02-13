@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ReactQueryProvider } from "@/providers/queryClientProvider";
 import FloatingWhatsappButton from "@/components/WhatsappButton";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <FloatingWhatsappButton />
+          <ReactQueryDevtools initialIsOpen={true} />
         </ReactQueryProvider>
       </body>
     </html>

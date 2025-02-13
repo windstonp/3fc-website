@@ -9,8 +9,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { db } from "@/lib/firebase";
-import { IClientDTO, IProductDTO } from "@/validators";
-import { collection, getDocs } from "firebase/firestore";
+import { IClientDTO, ICompanyDTO, IProductDTO } from "@/validators";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { Footer } from "@/components/Footer";
@@ -37,6 +37,28 @@ export default function Home() {
       clientImage: docSnap.data().clientImage || "/placeholder.jpg",
     }));
   }
+
+  async function fetchCompanyData(): Promise<ICompanyDTO> {
+    const companyDocRef = doc(db, "company", "company-data");
+    const docSnapCompany = await getDoc(companyDocRef);
+    return docSnapCompany.exists()
+      ? (docSnapCompany.data() as ICompanyDTO)
+      : ({} as ICompanyDTO);
+  }
+
+  const {
+    data: company,
+    isLoading: isLoadingCompany,
+    isPending,
+  } = useQuery({
+    queryKey: ["company"],
+    queryFn: fetchCompanyData,
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const {
     data: products,
@@ -70,11 +92,15 @@ export default function Home() {
     <>
       <NavBar />
       <main id="Home">
-        <img
-          className="relative w-full"
-          src="/img/banner.png"
-          alt="Homepage banner"
-        />
+        {isLoadingCompany || isPending ? (
+          <div className="w-full h-[800] bg-gray-200 animate-pulse rounded-md"></div>
+        ) : (
+          <img
+            className="relative w-full"
+            src={company?.banner ?? "#"}
+            alt="Homepage banner"
+          />
+        )}
         <section id="services">
           <Container>
             <h1 className="mx-auto text-center text-3xl sm:text-4xl font-bold my-9">
